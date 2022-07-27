@@ -1,0 +1,18 @@
+.form-control {
+    font-size:.75em;
+}
+
+form .img-thumbnail{
+    width:75px;
+    height:75px;
+}
+
+form .user_row{
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    padding: 15px 0;
+}
+
+form .user_output{
+    display: block;
+    width: 100%;
+}
