@@ -248,7 +248,18 @@ const addNewUserListenerInit = () => {
             email = form.querySelector('[name=userEmail]').value,
             telephone = form.querySelector('[name=userTelephone]').value,
             birthday = form.querySelector('[name=userBirthday]').value,
-            userAvatar = form.querySelector('[name=userAvatar]').files[0];
+            userAvatar = form.querySelector('[name=userAvatar]').files[0],
+            formData = new FormData();
+
+            formData.append('fileupload', userAvatar);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then((response)=>{
+                console.log(response);
+            });
 
         lastUserId += 1;
 
@@ -259,7 +270,7 @@ const addNewUserListenerInit = () => {
             email,
             telephone,
             birthday,
-            profileImg: `/src/images/cropped_${userAvatar.name}`
+            profileImg: userAvatar ? `/src/images/cropped_${userAvatar.name}` : '/src/images/noavatar.jpg'
         }
 
         writeUserData(options);
