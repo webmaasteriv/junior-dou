@@ -14,6 +14,60 @@ let defaultRowsArr = new Array();
 let currentPage = 1;
 let lastUserId = 1;
 
+const doGetCaretPosition = (oField) => {
+
+    // Initialize
+    let iCaretPos = 0;
+  
+    // IE Support
+    if (document.selection) {
+  
+      // Set focus on the element
+      oField.focus();
+  
+      // To get cursor position, get empty selection range
+      var oSel = document.selection.createRange();
+  
+      // Move selection start to 0 position
+      oSel.moveStart('character', -oField.value.length);
+  
+      // The caret position is selection length
+      iCaretPos = oSel.text.length;
+    } else if (oField.selectionStart || oField.selectionStart == '0')
+      iCaretPos = oField.selectionDirection=='backward' ? oField.selectionStart : oField.selectionEnd;
+  
+    // Return results
+    return iCaretPos;
+  }
+
+
+const telPattern = (inputField)=>{
+    inputField.addEventListener('focus',(e)=>{
+        let field = e.currentTarget;
+        if ( field.value == '' ){
+            field.value = '+38(';
+            field.selectionStart = 4;
+        }
+    } );
+    
+    
+    inputField.addEventListener('input',(e)=>{
+        let field = e.currentTarget,
+            currentPosition = doGetCaretPosition(field),
+            patternRules = {
+                7: ')',
+                11: '-',
+                14: '-',
+            }
+
+        if (patternRules[`${currentPosition}`]){
+            field.value += patternRules[`${currentPosition}`];
+        }
+    });
+}
+
+document.onload = telPattern(userModal.querySelector('[name=userTelephone]'));
+
 const updateUserList = (formElement, data)=>{
     // let userDBList = JSON.stringify(data);
     let dataLength = Object.keys(data).length;
@@ -29,24 +83,24 @@ const updateUserList = (formElement, data)=>{
             </div>
             <div class="mb-3">
                 <label for="userName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="userName" placeholder="Name" value="${value.userName}">
+                <input type="text" class="form-control" name="userName" placeholder="Name" value="${value.userName}">
             </div>
             <div class="mb-3">
                 <label for="userLastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="userLastName" placeholder="Last name" value="${value.userLastName
+                <input type="text" class="form-control" name="userLastName" placeholder="Last name" value="${value.userLastName
 }">
             </div>
             <div class="mb-3">
                 <label for="userEmail" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="userEmail" placeholder="name@example.com" value="${value.userEmail}">
+                <input type="email" class="form-control" name="userEmail" placeholder="name@example.com" value="${value.userEmail}">
             </div>
             <div class="mb-3">
                 <label for="userTelephone" class="form-label">Telephone</label>
-                <input type="text" class="form-control" id="userTelephone" placeholder="+380 (XX) XXX-XX-XX" value="${value.userTelephone}">
+                <input type="text" class="form-control" name="userTelephone" maxlength="17" placeholder="+380(XX)XXX-XX-XX" value="${value.userTelephone}">
             </div>
             <div class="mb-3">
                 <label for="userBirthday" class="form-label">Birthday Date</label>
-                <input type="text" class="form-control" id="userBirthday" placeholder="YYYY-MM-DD-" value="${value.
+                <input type="text" class="form-control" name="userBirthday" placeholder="YYYY-MM-DD-" value="${value.
 userBirthday}">
             </div>
             <div class="mb-3">
@@ -83,6 +137,14 @@ const createUserRows = () => {
     return rowsArr;
 }
 
+const rowFieldsListener = ()=>{
+    let telephoneFields = userFormList.querySelectorAll('[name=userTelephone]');
+
+    telephoneFields.forEach((field)=>{
+        telPattern(field);
+    });
+}
+
 const starCountRef = ref(database, 'users/');
 onValue(starCountRef, (snapshot) => {
     const data = snapshot.val();
@@ -92,6 +154,7 @@ onValue(starCountRef, (snapshot) => {
     addNewUserListenerInit();
     updateUserRow();
     resetFilterSelection();
+    rowFieldsListener();
 });
 
 const deleteChild = el =>{
@@ -282,11 +345,11 @@ const updateUserRow = () => {
     userRowButtons.forEach((button)=>{
         button.addEventListener('click', (e) => {
             let userRow = e.currentTarget.closest('.user_row');
-            let name = userRow.querySelector('#userName').value,
-                lastName = userRow.querySelector('#userLastName').value,
-                email = userRow.querySelector('#userEmail').value,
-                telephone = userRow.querySelector('#userTelephone').value,
-                birthday = userRow.querySelector('#userBirthday').value;
+            let name = userRow.querySelector('[name=userName]').value,
+                lastName = userRow.querySelector('[name=userLastName]').value,
+                email = userRow.querySelector('[name=userEmail]').value,
+                telephone = userRow.querySelector('[name=userTelephone]').value,
+                birthday = userRow.querySelector('[name=userBirthday]').value;
             let userId = e.currentTarget.closest('.user_row').dataset.rowId;
 
             const options = {
