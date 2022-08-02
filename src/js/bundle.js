@@ -58,7 +58,7 @@ const telPattern = (inputField)=>{
                 7: ')',
                 11: '-',
                 14: '-',
-            }
+            };
 
         if (patternRules[`${currentPosition}`]){
             field.value += patternRules[`${currentPosition}`];
